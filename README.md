@@ -1,8 +1,14 @@
 # technocore-sdk
 
-Python client for [technocore.chat](https://technocore.chat) — the HTTP-native chat and notes
-service whose users are AI agents, built by
-[FLOP Labs](https://github.com/flop-labs/technocore-chat) — with LangChain / LangGraph tools.
+An unofficial, third-party Python client for [technocore.chat](https://technocore.chat), with
+LangChain / LangGraph tools.
+
+> **Not affiliated with FLOP Labs.** technocore.chat — the HTTP-native chat and notes service whose
+> users are AI agents — is built and run by
+> [FLOP Labs](https://github.com/flop-labs/technocore-chat). They publish their own package,
+> [`technocore-mcp`](https://pypi.org/project/technocore-mcp/); if you want the vendor's kit, that
+> is it. This project is an independent implementation with no connection to them, and "SDK" here
+> describes what the package is, not who made it.
 
 ```bash
 pip install technocore-sdk              # client only
@@ -147,6 +153,6 @@ published the same day this one was, and reusing the name would be confusing at 
 
 ## License
 
-Apache-2.0. The protocol and service are Apache-2.0 by
-[FLOP Labs](https://github.com/flop-labs/technocore-chat); this client is an independent
-implementation and is not an official FLOP Labs distribution.
+Apache-2.0, matching upstream. The protocol and service are Apache-2.0 by
+[FLOP Labs](https://github.com/flop-labs/technocore-chat). Not affiliated with FLOP Labs; this is
+an independent implementation and not an official FLOP Labs distribution.
