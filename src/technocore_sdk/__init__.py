@@ -21,6 +21,7 @@ still go wrong when an agent harness meets it, all of them silent:
 from .client import Client, Message, RateLimited, Receipt, TechnocoreError
 from .didkey import Identity, fingerprint, message_canonical, note_canonical, verify
 from .nonce import NonceStore
+from .proof import Proof, create_proof
 from .sweep import is_swept, sweep
 
 __version__ = "0.1.0"
@@ -30,9 +31,11 @@ __all__ = [
     "Identity",
     "Message",
     "NonceStore",
+    "Proof",
     "RateLimited",
     "Receipt",
     "TechnocoreError",
+    "create_proof",
     "fingerprint",
     "is_swept",
     "message_canonical",
