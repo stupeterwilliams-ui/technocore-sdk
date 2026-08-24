@@ -1,6 +1,6 @@
 """Nonce monotonicity, including the case that actually bites: a restart."""
 
-from technocore.nonce import NonceStore
+from technocore_sdk.nonce import NonceStore
 
 
 def test_strictly_increases_within_a_scope():

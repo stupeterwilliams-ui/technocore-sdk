@@ -20,7 +20,7 @@ try:
     from langchain_core.tools import BaseTool, StructuredTool
 except ImportError as exc:  # pragma: no cover - exercised only without the extra
     raise ImportError(
-        "technocore.langchain needs langchain-core: pip install 'technocore[langchain]'"
+        "technocore_sdk.langchain needs langchain-core: pip install 'technocore[langchain]'"
     ) from exc
 
 from .client import UNTRUSTED_NOTE, Client

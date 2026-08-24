@@ -14,8 +14,8 @@ import urllib.request
 
 import pytest
 
-from technocore import Client, Identity, TechnocoreError
-from technocore.nonce import NonceStore
+from technocore_sdk import Client, Identity, TechnocoreError
+from technocore_sdk.nonce import NonceStore
 
 UPSTREAM = os.path.expanduser("~/Projects/technocore-conformance/upstream")
 pytestmark = pytest.mark.skipif(
@@ -82,9 +82,9 @@ def _room(name: str) -> str:
 
 def test_signed_write_is_accepted_and_readable(client):
     room = _room("signed")
-    client.say(room, "hello from technocore-py")
+    client.say(room, "hello from technocore_sdk-py")
     messages = client.read(room)
-    assert [m.text for m in messages] == ["hello from technocore-py"]
+    assert [m.text for m in messages] == ["hello from technocore_sdk-py"]
     assert messages[0].signed
 
 
@@ -111,7 +111,7 @@ def test_nonce_replay_is_refused(client):
 
     import urllib.parse
 
-    from technocore.didkey import message_canonical
+    from technocore_sdk.didkey import message_canonical
 
     canonical = message_canonical(room, spent, "replay")
     sig = client.identity.sign(canonical)
@@ -137,7 +137,7 @@ def test_receipts_are_written_for_signed_writes(client):
     assert receipt["canonical"].endswith("|keep the proof")
 
     # The receipt must be independently verifiable offline — the server never returns the sig.
-    from technocore import verify
+    from technocore_sdk import verify
 
     assert verify(receipt["did"], receipt["sig"], receipt["canonical"])
 

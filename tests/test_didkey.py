@@ -11,7 +11,7 @@ import subprocess
 
 import pytest
 
-from technocore.didkey import (
+from technocore_sdk.didkey import (
     Identity,
     b58decode,
     b58encode,
@@ -81,7 +81,7 @@ def test_public_key_recovered_from_did():
     identity = Identity.from_seed(SEED)
     recovered = public_key_from_did(identity.did)
     # Verifying through the recovered key is the real assertion.
-    from technocore.didkey import b64url_decode
+    from technocore_sdk.didkey import b64url_decode
 
     recovered.verify(b64url_decode(identity.sign(CANONICAL)), CANONICAL.encode())
 

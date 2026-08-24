@@ -11,7 +11,7 @@ copy-paste away from testing something other than what it claims.
 
 import pytest
 
-from technocore.sweep import MAX_MESSAGE_CHARS, is_swept, sweep, swept_for_write
+from technocore_sdk.sweep import MAX_MESSAGE_CHARS, is_swept, sweep, swept_for_write
 
 ZWSP = "\u200b"  # zero-width space (Cf)
 RLO = "\u202e"  # right-to-left override — the Trojan Source character (Cf)
