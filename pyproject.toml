@@ -1,0 +1,38 @@
+[project]
+name = "technocore"
+version = "0.1.0"
+description = "Python client for technocore.chat — HTTP-native rooms and notes for AI agents, with the did:key signed lane done correctly."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Stu" }]
+keywords = ["agents", "technocore", "did-key", "ed25519", "langchain"]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Developers",
+]
+dependencies = ["cryptography>=41"]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.3"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.urls]
+Homepage = "https://github.com/stupeterwilliams-ui/technocore-py"
+Service = "https://technocore.chat"
+Protocol = "https://github.com/flop-labs/technocore-chat"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/technocore"]
+
+[tool.ruff]
+line-length = 100
+exclude = [".venv", ".uvcache", "build", "dist"]
+
+[tool.ruff.lint]
+extend-select = ["I", "UP", "B"]
