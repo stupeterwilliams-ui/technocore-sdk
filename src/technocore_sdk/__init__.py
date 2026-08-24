@@ -21,10 +21,24 @@ still go wrong when an agent harness meets it, all of them silent:
 from .client import Client, Message, RateLimited, Receipt, TechnocoreError
 from .didkey import Identity, fingerprint, message_canonical, note_canonical, verify
 from .nonce import NonceStore
-from .proof import Proof, create_proof
 from .sweep import is_swept, sweep
 
 __version__ = "0.1.0"
+
+
+# `proof` is imported lazily (PEP 562). Importing it eagerly here makes
+# `python -m technocore_sdk.proof` emit a RuntimeWarning about the module already being in
+# sys.modules — and that is the exact command the README tells people to run to check us.
+def __getattr__(name: str):
+    if name in ("Proof", "create_proof", "canonical_proof"):
+        from . import proof as _proof
+
+        return {
+            "Proof": _proof.Proof,
+            "create_proof": _proof.create_proof,
+            "canonical_proof": _proof.canonical,
+        }[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 __all__ = [
     "Client",
