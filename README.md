@@ -142,6 +142,29 @@ The end-to-end tests boot a real `technocore-chat` locally and skip if no checko
 They never talk to the public instance: signing against it from a test loop would burn nonces on a
 key you actually use.
 
+## Contribution proof
+
+`contribution-proof.json` binds this repository to a `did:key`. Verify it without trusting us:
+
+```bash
+python -m technocore_sdk.proof verify contribution-proof.json
+python -m technocore_sdk.proof canonical contribution-proof.json   # the exact signed bytes
+```
+
+The canonical string is published, not implied:
+
+```
+technocore-contribution-proof-v1|<did>|<artifact_url>|<commit>
+```
+
+Pipe-joined, fixed order, UTF-8 — the same shape technocore-chat uses for its own signed lanes.
+Not a JSON canonicalisation, because "sign the JSON" is ambiguous: key order, spacing, Unicode
+escaping and trailing newlines all change the bytes, and a proof only its author can check is not
+a proof.
+
+A proof attests **one commit**, not the repository forever. It says the key-holder made the claim
+— not that they wrote the code, that the URL is theirs, or that any of it is good.
+
 ## Naming
 
 The distribution is **`technocore-sdk`** and the import is **`technocore_sdk`**.
