@@ -1,0 +1,238 @@
+{
+  "schema": "technocore-signer-vectors-v1",
+  "generated_by": "https://github.com/stupeterwilliams-ui/technocore-sdk",
+  "license": "Apache-2.0",
+  "purpose": "Fixed vectors for the three things a Technocore signer must get exactly right: the single-line sweep, the canonical string, and the resulting Ed25519 signature. Contributed for use in any implementation.",
+  "identity": {
+    "seed_hex": "0707070707070707070707070707070707070707070707070707070707070707",
+    "did": "did:key:z6MkvDqGT54cXesYGvABpF1UapVNwjCqRcafi4Px6Thv5T3Z",
+    "note": "Ed25519 signing is deterministic, so these signatures are exact byte strings. An implementation that reproduces them agrees with this one everywhere, not just on these inputs."
+  },
+  "sweep": {
+    "rule": "Replace every character whose Unicode general category is Cc, Cf, Cs, Co, Zl or Zp with a space (U+0020), then strip leading and trailing whitespace.",
+    "categories": [
+      "Cc",
+      "Cf",
+      "Cs",
+      "Co",
+      "Zl",
+      "Zp"
+    ],
+    "vectors": [
+      {
+        "name": "sweep: zero-width space",
+        "input": "a\u200bb",
+        "expected": "a b",
+        "why": "Cf. The common one: pasted from a web page, renders as nothing."
+      },
+      {
+        "name": "sweep: right-to-left override",
+        "input": "a\u202eb",
+        "expected": "a b",
+        "why": "Cf. Trojan Source. Can make stored text read differently from the source."
+      },
+      {
+        "name": "sweep: soft hyphen",
+        "input": "a\u00adb",
+        "expected": "a b",
+        "why": "Cf. Survives copy-paste from PDFs and word processors."
+      },
+      {
+        "name": "sweep: newline",
+        "input": "a\nb",
+        "expected": "a b",
+        "why": "Cc. The storage invariant is one record per line."
+      },
+      {
+        "name": "sweep: carriage return",
+        "input": "a\rb",
+        "expected": "a b",
+        "why": "Cc. Arrives with anything that has touched Windows."
+      },
+      {
+        "name": "sweep: tab",
+        "input": "a\tb",
+        "expected": "a b",
+        "why": "Cc."
+      },
+      {
+        "name": "sweep: line separator",
+        "input": "a\u2028b",
+        "expected": "a b",
+        "why": "Zl."
+      },
+      {
+        "name": "sweep: paragraph separator",
+        "input": "a\u2029b",
+        "expected": "a b",
+        "why": "Zp."
+      },
+      {
+        "name": "sweep: zero-width joiner",
+        "input": "a\u200db",
+        "expected": "a b",
+        "why": "Cf. Splits or joins emoji sequences."
+      },
+      {
+        "name": "sweep: word joiner",
+        "input": "a\u2060b",
+        "expected": "a b",
+        "why": "Cf."
+      },
+      {
+        "name": "sweep: BOM / zero-width no-break space",
+        "input": "a\ufeffb",
+        "expected": "a b",
+        "why": "Cf. Leads many files."
+      },
+      {
+        "name": "sweep: next line",
+        "input": "a\u0085b",
+        "expected": "a b",
+        "why": "Cc. A C1 control, easy to miss when only C0 is handled."
+      },
+      {
+        "name": "sweep: Unicode tag character",
+        "input": "a\udb40\udc41b",
+        "expected": "a b",
+        "why": "Cf. Invisible and can carry a payload."
+      },
+      {
+        "name": "survives: no-break space",
+        "input": "a\u00a0b",
+        "expected": "a\u00a0b",
+        "why": "Zs, not in the swept set. Must survive unchanged."
+      },
+      {
+        "name": "survives: emoji",
+        "input": "a\ud83d\ude80b",
+        "expected": "a\ud83d\ude80b",
+        "why": "So. Must survive unchanged."
+      },
+      {
+        "name": "survives: e-acute",
+        "input": "a\u00e9b",
+        "expected": "a\u00e9b",
+        "why": "Ll. Must survive unchanged."
+      },
+      {
+        "name": "trims the ends",
+        "input": "  hi  ",
+        "expected": "hi",
+        "why": "Trim happens after replacement, so swept characters at the ends disappear too."
+      },
+      {
+        "name": "trims swept characters at the ends",
+        "input": "\u200bhi\u200b",
+        "expected": "hi",
+        "why": "The failure that produces a 403 nobody can explain: the client signs the untrimmed text and the server stores the trimmed text."
+      },
+      {
+        "name": "keeps interior runs",
+        "input": "a   b",
+        "expected": "a   b",
+        "why": "Interior whitespace is not collapsed. Only invisibles become spaces."
+      },
+      {
+        "name": "consecutive invisibles each become a space",
+        "input": "a\u200b\u200bb",
+        "expected": "a  b",
+        "why": "One space per character, not one per run."
+      }
+    ]
+  },
+  "canonical_strings": {
+    "message": "<room>|<nonce>|<text after sweep>",
+    "note": "<namespace>|<key>|<nonce>|<value after sweep>",
+    "critical": "The signature covers the text AFTER the sweep \u2014 the bytes the server stores. Signing the raw input returns 403 for any text containing an invisible character, and the cause is not visible in the input.",
+    "message_vectors": [
+      {
+        "room": "lobby",
+        "nonce": 1,
+        "text_before_sweep": "hello world",
+        "text_after_sweep": "hello world",
+        "canonical": "lobby|1|hello world",
+        "signature": "fVc7wd0O78uyyk90jD7bkVmLIPeQWyrHQ2Qf9HVGKQzrImnWDUkFdRu8EvO7oiYyM7Bq90Wp8-KufIojB5MBCA"
+      },
+      {
+        "room": "lobby",
+        "nonce": 1,
+        "text_before_sweep": "a\u200bb",
+        "text_after_sweep": "a b",
+        "canonical": "lobby|1|a b",
+        "signature": "1RPZLYBOY2SiEhAwUbx5S_-isUKCCjOnlkgdxtCUoRMJqMKozgA7DYUVjXJauPk8_0KrJps4hprfGSc1ACVYBg"
+      },
+      {
+        "room": "meta",
+        "nonce": 42,
+        "text_before_sweep": "  padded  ",
+        "text_after_sweep": "padded",
+        "canonical": "meta|42|padded",
+        "signature": "rWWzNmzk_JKKVdPP9lWsojpbXHHzKZYU8zJSI5Dx4LQ-Y3XEypUlaniCGv-fDFzNmhqftx16bjzLkoRF0715Cg"
+      },
+      {
+        "room": "mb-p-abc",
+        "nonce": 7,
+        "text_before_sweep": "mailbox line",
+        "text_after_sweep": "mailbox line",
+        "canonical": "mb-p-abc|7|mailbox line",
+        "signature": "LBQ_WSlk_F8ldS8sactiQ_9GhpY-ZwaB6N7cs17BbDFDy2DjN8Y72Uaj5XNSSjvr2RXbxJgHIIwVNo3Utf_lCQ"
+      },
+      {
+        "room": "lobby",
+        "nonce": 999999999999999,
+        "text_before_sweep": "large nonce",
+        "text_after_sweep": "large nonce",
+        "canonical": "lobby|999999999999999|large nonce",
+        "signature": "x00xqncAK8iz_Mv0L2rGQ8YcXAjWtfb7XM3Mtzi--rrTwslGbDqdtUlSapNTjKV21Cmqp9WGAcPg7OXoySpQBA"
+      }
+    ],
+    "note_vectors": [
+      {
+        "namespace": "room-owners",
+        "key": "d-demo",
+        "nonce": 3,
+        "value": "did:key:z6MkvDqGT54cXesYGvABpF1UapVNwjCqRcafi4Px6Thv5T3Z",
+        "canonical": "room-owners|d-demo|3|did:key:z6MkvDqGT54cXesYGvABpF1UapVNwjCqRcafi4Px6Thv5T3Z",
+        "signature": "0TdqnXQPGnPRc8qZigU-lAaNyynItS84vNcCv57EwfzICiiE25kNyyN64_0dBDkePrcDUwTmB33jmnK-BY13Dw"
+      },
+      {
+        "namespace": "room-allow",
+        "key": "d-demo",
+        "nonce": 4,
+        "value": "did:key:z6MkvDqGT54cXesYGvABpF1UapVNwjCqRcafi4Px6Thv5T3Z",
+        "canonical": "room-allow|d-demo|4|did:key:z6MkvDqGT54cXesYGvABpF1UapVNwjCqRcafi4Px6Thv5T3Z",
+        "signature": "ZkWKX13Dx1XTDbA9ogT8oCEqiVYdyagwjlMEeyZHz56SmgDc5rfWiY3LOP0g6u7iOx76AEGkDSgoWUNd9YFVDQ"
+      }
+    ]
+  },
+  "nonce_lifecycle": {
+    "rule": "A nonce must be strictly greater than the last nonce that key used in that room. Scope is (key, room), not global.",
+    "cases": [
+      {
+        "name": "strictly increases within a scope",
+        "assert": "Allocating repeatedly for one scope yields strictly increasing values with no repeats, including within a single millisecond.",
+        "why": "A millisecond clock alone repeats under a fast loop and the second write is refused."
+      },
+      {
+        "name": "survives a restart",
+        "assert": "After reloading persisted state, the next value exceeds every value issued before the restart.",
+        "why": "The failure that actually bites in production: an in-memory counter restarts low and every write is refused until it climbs past its own history. Nothing in the manual warns about it."
+      },
+      {
+        "name": "scopes are independent",
+        "assert": "A fresh scope is not held back by another scope's counter."
+      },
+      {
+        "name": "corrupt persisted state does not wedge the client",
+        "assert": "An unreadable store falls back to a clock floor rather than raising.",
+        "why": "A corrupt file should cost you a nonce gap, not the ability to write."
+      },
+      {
+        "name": "one signer per key",
+        "assert": "Two processes signing with one key against one room interleave and refuse each other. No library can fix this; it belongs in the docs.",
+        "why": "Discovered the hard way is expensive: both signers start failing at once."
+      }
+    ]
+  }
+}

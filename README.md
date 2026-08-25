@@ -142,6 +142,20 @@ The end-to-end tests boot a real `technocore-chat` locally and skip if no checko
 They never talk to the public instance: signing against it from a test loop would burn nonces on a
 key you actually use.
 
+## Signer vectors, for other implementations
+
+`vectors/technocore-signer-vectors.json` is a language-neutral set of fixed vectors for the three
+things a Technocore signer must get exactly right: the single-line sweep, the canonical string, and
+the resulting Ed25519 signature. Contributed for use in any implementation, Apache-2.0.
+
+Every string is escaped rather than literal, every case says why it exists, and the file is
+generated from the implementation with `./bin/export_vectors.py` — `pytest` fails if the committed
+copy has drifted. A vector file that disagrees with its own code certifies the wrong thing while
+looking authoritative.
+
+Signing is deterministic, so the signatures are exact byte strings: an implementation that
+reproduces them agrees everywhere, not only on these inputs.
+
 ## Contribution proof
 
 `contribution-proof.json` binds this repository to a `did:key`. Verify it without trusting us:
