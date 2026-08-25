@@ -30,26 +30,26 @@ OUT = ROOT / "vectors" / "technocore-signer-vectors.json"
 SEED_HEX = "07" * 32
 
 SWEEP_CASES = [
-    ("​", "zero-width space", "Cf. The common one: pasted from a web page, renders as nothing."),
-    ("‮", "right-to-left override", "Cf. Trojan Source. Can make stored text read differently from the source."),
-    ("­", "soft hyphen", "Cf. Survives copy-paste from PDFs and word processors."),
+    ("\u200b", "zero-width space", "Cf. The common one: pasted from a web page, renders as nothing."),
+    ("\u202e", "right-to-left override", "Cf. Trojan Source. Can make stored text read differently from the source."),
+    ("\u00ad", "soft hyphen", "Cf. Survives copy-paste from PDFs and word processors."),
     ("\n", "newline", "Cc. The storage invariant is one record per line."),
     ("\r", "carriage return", "Cc. Arrives with anything that has touched Windows."),
     ("\t", "tab", "Cc."),
-    (" ", "line separator", "Zl."),
-    (" ", "paragraph separator", "Zp."),
-    ("‍", "zero-width joiner", "Cf. Splits or joins emoji sequences."),
-    ("⁠", "word joiner", "Cf."),
-    ("﻿", "BOM / zero-width no-break space", "Cf. Leads many files."),
-    ("", "next line", "Cc. A C1 control, easy to miss when only C0 is handled."),
+    ("\u2028", "line separator", "Zl."),
+    ("\u2029", "paragraph separator", "Zp."),
+    ("\u200d", "zero-width joiner", "Cf. Splits or joins emoji sequences."),
+    ("\u2060", "word joiner", "Cf."),
+    ("\ufeff", "BOM / zero-width no-break space", "Cf. Leads many files."),
+    ("\u0085", "next line", "Cc. A C1 control, easy to miss when only C0 is handled."),
     ("\U000e0041", "Unicode tag character", "Cf. Invisible and can carry a payload."),
 ]
 
 # Not swept: proof that the rule is by Unicode category, not a blocklist of odd characters.
 SURVIVES = [
-    (" ", "no-break space", "Zs, not in the swept set. Must survive unchanged."),
+    ("\u00a0", "no-break space", "Zs, not in the swept set. Must survive unchanged."),
     ("\U0001f680", "emoji", "So. Must survive unchanged."),
-    ("é", "e-acute", "Ll. Must survive unchanged."),
+    ("\u00e9", "e-acute", "Ll. Must survive unchanged."),
 ]
 
 
@@ -77,20 +77,20 @@ def build() -> dict:
         {"name": "trims the ends", "input": "  hi  ", "expected": sweep("  hi  "),
          "why": "Trim happens after replacement, so swept characters at the ends disappear too."},
         {"name": "trims swept characters at the ends",
-         "input": "​hi​", "expected": sweep("​hi​"),
+         "input": "\u200bhi\u200b", "expected": sweep("\u200bhi\u200b"),
          "why": "The failure that produces a 403 nobody can explain: the client signs the "
                 "untrimmed text and the server stores the trimmed text."},
         {"name": "keeps interior runs", "input": "a   b", "expected": sweep("a   b"),
          "why": "Interior whitespace is not collapsed. Only invisibles become spaces."},
         {"name": "consecutive invisibles each become a space",
-         "input": f"a{chr(0x200b)}{chr(0x200b)}b", "expected": sweep("a​​b"),
+         "input": f"a{chr(0x200b)}{chr(0x200b)}b", "expected": sweep("a\u200b\u200bb"),
          "why": "One space per character, not one per run."},
     ]
 
     message_vectors = []
     for room, nonce, text in [
         ("lobby", 1, "hello world"),
-        ("lobby", 1, "a​b"),
+        ("lobby", 1, "a\u200bb"),
         ("meta", 42, "  padded  "),
         ("mb-p-abc", 7, "mailbox line"),
         ("lobby", 999999999999999, "large nonce"),
